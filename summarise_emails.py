@@ -1,22 +1,22 @@
 import os
 import argparse
-from email.parser import Parser
+from email import message_from_string
 
 from bs4 import BeautifulSoup
 from mailparser_reply import EmailReplyParser
 import openai
 
-def summarise_email(raw_email: str) -> str:
+def summarise_email(email_str: str) -> str:
+    """Extract the latest reply from an email thread and return a short summary
+    """
     # parse plain text body from raw email
-    p = Parser()    
-    msg = p.parsestr(raw_email)
-    body=""
+    msg = message_from_string(email_str)
     if msg.is_multipart():
         for part in msg.walk():
             if 'text/plain' in part.get_content_type():
-               body += part.get_payload(decode=True).decode('utf-8')
+               body = part.get_payload(decode=True)
     else:
-        body = msg.get_payload(decode=True).decode('utf-8')
+        body = msg.get_payload(decode=True)
 
     # remove any formatting tags
     soup = BeautifulSoup(body, features="html.parser")
@@ -24,8 +24,8 @@ def summarise_email(raw_email: str) -> str:
     
     # extract latest reply
     rp = EmailReplyParser()
-    msg = rp.read(mail_body)
-    latest_reply = msg.replies[0].body
+    m = rp.read(mail_body)
+    latest_reply = m.replies[0].body
 
     # summarise latest reply using OpenAI
     prompt = f"Summarise this email in one sentence: {latest_reply}"
