@@ -14,10 +14,10 @@ def summarise_folder(path: str) -> list:
             msg = EmailSummary(raw_email)
             results.append(
                 {
-                    "subject": msg.subject,
-                    "from": getattr(msg, "from"),
-                    "to": msg.to,
-                    "date": msg.date,
+                    "subject": msg.Subject,
+                    "from": msg.From,
+                    "to": msg.To,
+                    "date": msg.Date,
                     "uri": item.as_uri(),
                     "summary": msg.summary,
                 }

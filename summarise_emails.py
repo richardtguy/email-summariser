@@ -10,8 +10,11 @@ class EmailSummary():
     def __init__(self, email_str):
         # parse email message from string
         self.msg = message_from_string(email_str)
+        # set email headers as attributes
         for k, v in self.msg.items():
-            setattr(self, k.lower(), v)
+            # reformat header keys to title case, to avoid clashes with keywords
+            k = "".join([x.title() for x in k.lower().split("-")])
+            setattr(self, k, v)
         self._summarise_latest_reply()
 
     def _summarise_latest_reply(self):
