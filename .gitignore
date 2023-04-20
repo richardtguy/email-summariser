@@ -19,5 +19,6 @@ app.db*
 *.json
 uploads/
 emails/
+summary.html
 
 .DS_Store

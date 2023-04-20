@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <title>Document</title>
+</head>
+<body>
+    <div class="w3-panel">
+        Search: <input type="text" oninput="filterTableRows('table', this.value)">
+    </div>
+    <div class="w3-container">
+        <table id="table" class="w3-table w3-striped w3-hoverable">
+            <thead class="w3-green">
+                <tr>
+                    <td>Date</td>
+                    <td>Subject</td>
+                    <td>From</td>
+                    <td>To</td>
+                    <td>Summary</td>
+                    <td>URI</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for email in emails %}
+                <tr>
+                    <td>{{ email["date"] }}</td>
+                    <td>{{ email["subject"] }}</td>
+                    <td>{{ email["from"] }}</td>
+                    <td>{{ email["to"] }}</td>
+                    <td>{{ email["summary"] }}</td>
+                    <td><a href="{{ email["uri"] }}">Link</a></td>
+                </tr>
+                {% endfor %}    
+            </tbody>
+        </table>
+    </div>
+<script>
+    function filterTableRows(tableId, filterString) {
+    const table = document.getElementById(tableId);
+    const body = table.getElementsByTagName('tbody')[0];
+    const rows = body.getElementsByTagName('tr');
+    for (let i = 0; i < rows.length; i++) {
+        const cells = rows[i].getElementsByTagName('td');
+        let shouldShowRow = false;
+        for (let j = 0; j < cells.length; j++) {
+            if (cells[j].innerHTML.toLowerCase().includes(filterString.toLowerCase())) {
+                shouldShowRow = true;
+                break;
+            }
+        }
+        if (shouldShowRow) {
+            rows[i].style.display = '';
+        } else {
+            rows[i].style.display = 'none';
+        }
+    }
+}
+</script>
+</body>
+</html>

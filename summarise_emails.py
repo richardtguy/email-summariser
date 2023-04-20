@@ -1,5 +1,6 @@
 import os
 import argparse
+import time
 from email import message_from_string
 
 from bs4 import BeautifulSoup
@@ -19,6 +20,7 @@ class EmailSummary():
 
     def _summarise_latest_reply(self):
         # extract plain text body
+        body = ''
         if self.msg.is_multipart():
             for part in self.msg.walk():
                 if 'text/plain' in part.get_content_type():
@@ -38,12 +40,18 @@ class EmailSummary():
         # summarise latest reply using OpenAI
         prompt = f"Summarise this email in one sentence: {latest_reply}"
         openai.api_key = os.getenv("OPENAI_API_KEY")
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "user", "content": prompt}
-            ]
-        )
+        while True:
+            try:
+                response = openai.ChatCompletion.create(
+                    model="gpt-3.5-turbo",
+                    messages=[
+                        {"role": "user", "content": prompt}
+                    ]
+                )
+                break
+            except (openai.error.RateLimitError, openai.error.Timeout):
+                # wait before trying again
+                time.sleep(2)
         self.summary = response['choices'][0]['message']['content']
     
 if __name__ == '__main__':
